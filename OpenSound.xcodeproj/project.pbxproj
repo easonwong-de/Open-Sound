@@ -6,8 +6,49 @@
 	objectVersion = 90;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		9B0B18453069ECCE00ECFF8F /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 9B0B18433069ECCE00ECFF8F /* LICENSE */; };
+		9B0B18463069ECCE00ECFF8F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 9B0B18443069ECCE00ECFF8F /* README.md */; };
+		9B0B18713069ECC200ECFF8F /* OpenSoundAudioDriver.iig in Sources */ = {isa = PBXBuildFile; fileRef = 9B0B183B3069ECC200ECFF8F /* OpenSoundAudioDriver.iig */; };
+		9B0B18723069ECC200ECFF8F /* OpenSoundAudioDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B0B183E3069ECC200ECFF8F /* OpenSoundAudioDriver.cpp */; };
+		9B0B18733069ECC200ECFF8F /* DriverKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B0B18473069ECC200ECFF8F /* DriverKit.framework */; };
+		9B0B18743069ECC200ECFF8F /* AudioDriverKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B0B18483069ECC200ECFF8F /* AudioDriverKit.framework */; };
+		9B0B18753069ECC200ECFF8F /* AudioDriver.dext in Embed System Extensions */ = {isa = PBXBuildFile; fileRef = 9B0B18503069ECC200ECFF8F /* AudioDriver.dext */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9B0B18903069ECC200ECFF8F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9B0B18603069ECC200ECFF8F;
+			remoteInfo = AudioDriver;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9B0B18803069ECC200ECFF8F /* Embed System Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				9B0B18753069ECC200ECFF8F /* AudioDriver.dext in Embed System Extensions */,
+			);
+			name = "Embed System Extensions";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* OpenSound.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenSound.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B0B183B3069ECC200ECFF8F /* OpenSoundAudioDriver.iig */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.iig; path = OpenSoundAudioDriver.iig; sourceTree = "<group>"; };
+		9B0B183C3069ECC200ECFF8F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9B0B183E3069ECC200ECFF8F /* OpenSoundAudioDriver.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = OpenSoundAudioDriver.cpp; sourceTree = "<group>"; };
+		9B0B183F3069ECC200ECFF8F /* OpenSoundAudioDriver.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpenSoundAudioDriver.entitlements; sourceTree = "<group>"; };
+		9B0B18433069ECCE00ECFF8F /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		9B0B18443069ECCE00ECFF8F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		9B0B18473069ECC200ECFF8F /* DriverKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DriverKit.framework; path = System/DriverKit/System/Library/Frameworks/DriverKit.framework; sourceTree = SDKROOT; };
+		9B0B18483069ECC200ECFF8F /* AudioDriverKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioDriverKit.framework; path = System/DriverKit/System/Library/Frameworks/AudioDriverKit.framework; sourceTree = SDKROOT; };
+		9B0B18503069ECC200ECFF8F /* AudioDriver.dext */ = {isa = PBXFileReference; explicitFileType = "wrapper.driver-extension"; includeInIndex = 0; path = AudioDriver.dext; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -24,6 +65,13 @@
 			files = (
 			);
 		};
+		9B0B18633069ECC200ECFF8F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				9B0B18733069ECC200ECFF8F /* DriverKit.framework in Frameworks */,
+				9B0B18743069ECC200ECFF8F /* AudioDriverKit.framework in Frameworks */,
+			);
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -31,6 +79,10 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000010 /* OpenSound */,
+				9B0B18403069ECC200ECFF8F /* AudioDriver */,
+				9B0B18493069ECC200ECFF8F /* Frameworks */,
+				9B0B18433069ECCE00ECFF8F /* LICENSE */,
+				9B0B18443069ECCE00ECFF8F /* README.md */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -39,8 +91,29 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000120 /* OpenSound.app */,
+				9B0B18503069ECC200ECFF8F /* AudioDriver.dext */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9B0B18403069ECC200ECFF8F /* AudioDriver */ = {
+			isa = PBXGroup;
+			children = (
+				9B0B183B3069ECC200ECFF8F /* OpenSoundAudioDriver.iig */,
+				9B0B183E3069ECC200ECFF8F /* OpenSoundAudioDriver.cpp */,
+				9B0B183C3069ECC200ECFF8F /* Info.plist */,
+				9B0B183F3069ECC200ECFF8F /* OpenSoundAudioDriver.entitlements */,
+			);
+			path = AudioDriver;
+			sourceTree = "<group>";
+		};
+		9B0B18493069ECC200ECFF8F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9B0B18473069ECC200ECFF8F /* DriverKit.framework */,
+				9B0B18483069ECC200ECFF8F /* AudioDriverKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -53,16 +126,34 @@
 				000000000000000120000000 /* Sources */,
 				000000000000000130000000 /* Frameworks */,
 				000000000000000140000000 /* Resources */,
+				9B0B18803069ECC200ECFF8F /* Embed System Extensions */,
 			);
 			buildRules = (
+			);
+			dependencies = (
+				9B0B18913069ECC200ECFF8F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				000000000000000000000010 /* OpenSound */,
 			);
 			name = OpenSound;
-			productName = MyApp;
+			productName = OpenSound;
 			productReference = 000000000000000000000120 /* OpenSound.app */;
 			productType = "com.apple.product-type.application";
+		};
+		9B0B18603069ECC200ECFF8F /* AudioDriver */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B0B18613069ECC200ECFF8F /* Build configuration list for PBXNativeTarget "AudioDriver" */;
+			buildPhases = (
+				9B0B18623069ECC200ECFF8F /* Sources */,
+				9B0B18633069ECC200ECFF8F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			name = AudioDriver;
+			productName = AudioDriver;
+			productReference = 9B0B18503069ECC200ECFF8F /* AudioDriver.dext */;
+			productType = "com.apple.product-type.driver-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -75,6 +166,9 @@
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					000000000000000100000000 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					9B0B18603069ECC200ECFF8F = {
 						CreatedOnToolsVersion = 26.3;
 					};
 				};
@@ -94,6 +188,7 @@
 			projectRoot = "";
 			targets = (
 				000000000000000100000000 /* OpenSound */,
+				9B0B18603069ECC200ECFF8F /* AudioDriver */,
 			);
 		};
 /* End PBXProject section */
@@ -102,6 +197,8 @@
 		000000000000000140000000 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				9B0B18453069ECCE00ECFF8F /* LICENSE in Resources */,
+				9B0B18463069ECCE00ECFF8F /* README.md in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
@@ -112,7 +209,22 @@
 			files = (
 			);
 		};
+		9B0B18623069ECC200ECFF8F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				9B0B18713069ECC200ECFF8F /* OpenSoundAudioDriver.iig in Sources */,
+				9B0B18723069ECC200ECFF8F /* OpenSoundAudioDriver.cpp in Sources */,
+			);
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9B0B18913069ECC200ECFF8F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9B0B18603069ECC200ECFF8F /* AudioDriver */;
+			targetProxy = 9B0B18903069ECC200ECFF8F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		000000000000000011000000 /* Debug configuration for PBXProject "OpenSound" */ = {
@@ -151,7 +263,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DRIVERKIT_DEPLOYMENT_TARGET = 27.0;
+				DRIVERKIT_DEPLOYMENT_TARGET = 21.0;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -221,7 +333,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DRIVERKIT_DEPLOYMENT_TARGET = 27.0;
+				DRIVERKIT_DEPLOYMENT_TARGET = 21.0;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -250,20 +362,24 @@
 		000000000000000111000000 /* Debug configuration for PBXNativeTarget "OpenSound" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = OpenSound/OpenSound.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Open Sound";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "OpenSound requires microphone access to capture routed system audio.";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.easonwong.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = de.easonwong.OpenSound;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -280,20 +396,24 @@
 		000000000000000112000000 /* Release configuration for PBXNativeTarget "OpenSound" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = OpenSound/OpenSound.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Open Sound";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "OpenSound requires microphone access to capture routed system audio.";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.easonwong.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = de.easonwong.OpenSound;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -304,6 +424,50 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		9B0B18643069ECC200ECFF8F /* Debug configuration for PBXNativeTarget "AudioDriver" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = AudioDriver/OpenSoundAudioDriver.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				DRIVERKIT_DEPLOYMENT_TARGET = "$(RECOMMENDED_DRIVERKIT_DEPLOYMENT_TARGET)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AudioDriver/Info.plist;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.easonwong.OpenSound.AudioDriver;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = driverkit;
+				SUPPORTED_PLATFORMS = "driverkit.macosx driverkit";
+				SUPPORTS_MACCATALYST = NO;
+			};
+			name = Debug;
+		};
+		9B0B18653069ECC200ECFF8F /* Release configuration for PBXNativeTarget "AudioDriver" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = AudioDriver/OpenSoundAudioDriver.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				DRIVERKIT_DEPLOYMENT_TARGET = "$(RECOMMENDED_DRIVERKIT_DEPLOYMENT_TARGET)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AudioDriver/Info.plist;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.easonwong.OpenSound.AudioDriver;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = driverkit;
+				SUPPORTED_PLATFORMS = "driverkit.macosx driverkit";
+				SUPPORTS_MACCATALYST = NO;
 			};
 			name = Release;
 		};
@@ -323,6 +487,14 @@
 			buildConfigurations = (
 				000000000000000111000000 /* Debug configuration for PBXNativeTarget "OpenSound" */,
 				000000000000000112000000 /* Release configuration for PBXNativeTarget "OpenSound" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		9B0B18613069ECC200ECFF8F /* Build configuration list for PBXNativeTarget "AudioDriver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B0B18643069ECC200ECFF8F /* Debug configuration for PBXNativeTarget "AudioDriver" */,
+				9B0B18653069ECC200ECFF8F /* Release configuration for PBXNativeTarget "AudioDriver" */,
 			);
 			defaultConfigurationName = Release;
 		};
