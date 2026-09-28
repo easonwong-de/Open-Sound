@@ -1,7 +1,17 @@
-import AVFoundation
 import CoreAudio
+import Darwin
 import Foundation
 import os.log
+
+private let kOpenSoundShmName = "/opensound_audio_ring"
+private let kRingBufferSize: Int = 131072
+
+private struct OpenSoundSharedHeader {
+    var writeHead: UInt32
+    var sampleRate: UInt32
+    var channels: UInt32
+    var reserved: UInt32
+}
 
 /// Encapsulates runtime routing state for an individual physical audio output target.
 private final class DestinationDeviceContext {
@@ -10,6 +20,7 @@ private final class DestinationDeviceContext {
     var isRunning: Bool = false
     var volume: Float = 1.0
     var isMuted: Bool = false
+    var readHead: Int = 0
 
     /// Initialises a destination context for an audio endpoint.
     /// - Parameters:
@@ -25,76 +36,62 @@ private final class DestinationDeviceContext {
     }
 }
 
-/// Real-time audio routing engine managing virtual input capture and multi-destination broadcasting.
+/// Real-time audio routing engine broadcasting from driver shared memory to physical destinations.
 final class AudioRouterEngine: @unchecked Sendable {
     static let shared = AudioRouterEngine()
     private let logger = Logger(subsystem: "de.easonwong.OpenSound", category: "AudioRouterEngine")
 
-    private var virtualInputDeviceID: AudioObjectID?
-    private var virtualInputProcID: AudioDeviceIOProcID?
-    private var isCapturing: Bool = false
-
     private let destinationLock = NSLock()
     private var destinations: [AudioObjectID: DestinationDeviceContext] = [:]
 
-    private let ringBufferSize: Int = 131072
-    private var ringBuffer: [Float]
-    private var writeHead: Int = 0
-    private var readHead: Int = 0
-    private let ringBufferLock = NSLock()
+    nonisolated(unsafe) private var shmPointer: UnsafeMutableRawPointer?
+    private let totalShmSize = MemoryLayout<OpenSoundSharedHeader>.size + (kRingBufferSize * MemoryLayout<Float>.size)
 
     private init() {
-        ringBuffer = [Float](repeating: 0.0, count: 131072)
+        setupSharedMemory()
     }
 
-    /// Sets the source virtual audio device for loopback capture.
+    deinit {
+        if let ptr = shmPointer {
+            munmap(ptr, totalShmSize)
+        }
+    }
+
+    private typealias ShmOpenFunction = @convention(c) (UnsafePointer<CChar>, CInt, mode_t) -> CInt
+
+    private func openSharedMemory(name: String, flags: CInt, mode: mode_t) -> CInt {
+        guard let sym = dlsym(UnsafeMutableRawPointer(bitPattern: -2), "shm_open") else {
+            return -1
+        }
+        let fn = unsafeBitCast(sym, to: ShmOpenFunction.self)
+        return name.withCString { fn($0, flags, mode) }
+    }
+
+    /// Attaches to the POSIX shared memory ring buffer managed by the HAL driver.
+    private func setupSharedMemory() {
+        let fd = openSharedMemory(name: kOpenSoundShmName, flags: O_CREAT | O_RDWR, mode: 0o666)
+        guard fd >= 0 else {
+            logger.error("Failed to open shared memory: \(errno)")
+            return
+        }
+        fchmod(fd, 0o666)
+        ftruncate(fd, off_t(totalShmSize))
+        let addr = mmap(nil, totalShmSize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)
+        close(fd)
+        if addr != MAP_FAILED, let validAddr = addr {
+            shmPointer = validAddr
+            logger.info("Successfully mapped OpenSound shared memory ring buffer")
+        } else {
+            logger.error("Failed to map shared memory ring buffer")
+        }
+    }
+
+    /// Informs the engine of virtual device discovery.
     /// - Parameter deviceID: The audio device object ID, or `nil` to clear.
     func setVirtualDevice(deviceID: AudioObjectID?) {
-        guard virtualInputDeviceID != deviceID else { return }
-
-        stopCapture()
-        virtualInputDeviceID = deviceID
-        if deviceID != nil {
-            startCapture()
+        if shmPointer == nil {
+            setupSharedMemory()
         }
-    }
-
-    /// Starts capturing PCM audio frames from the virtual input stream.
-    func startCapture() {
-        guard let deviceID = virtualInputDeviceID, !isCapturing else { return }
-
-        let captureCallback: AudioDeviceIOProc = { _, _, inInputData, _, _, _, inClientData in
-            guard let inClientData else { return noErr }
-            let engine = Unmanaged<AudioRouterEngine>.fromOpaque(inClientData).takeUnretainedValue()
-            engine.handleInputAudio(bufferList: inInputData, frameCount: 512)
-            return noErr
-        }
-
-        let refCon = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-        let status = AudioDeviceCreateIOProcID(deviceID, captureCallback, refCon, &virtualInputProcID)
-
-        if status == noErr, let procID = virtualInputProcID {
-            let startStatus = AudioDeviceStart(deviceID, procID)
-            if startStatus == noErr {
-                isCapturing = true
-                logger.info("Started virtual audio capture on device \(deviceID)")
-            } else {
-                logger.error("Failed to start audio device IO proc: \(startStatus)")
-            }
-        } else {
-            logger.error("Failed to create IO Proc ID for virtual input device: \(status)")
-        }
-    }
-
-    /// Stops capturing audio from the virtual input stream.
-    func stopCapture() {
-        guard let deviceID = virtualInputDeviceID, let procID = virtualInputProcID, isCapturing else { return }
-
-        AudioDeviceStop(deviceID, procID)
-        AudioDeviceDestroyIOProcID(deviceID, procID)
-        virtualInputProcID = nil
-        isCapturing = false
-        logger.info("Stopped virtual audio capture")
     }
 
     /// Enables or disables routing to a specific physical output endpoint.
@@ -108,6 +105,10 @@ final class AudioRouterEngine: @unchecked Sendable {
         if enabled {
             guard destinations[deviceID] == nil else { return }
             let context = DestinationDeviceContext(deviceID: deviceID)
+            if let ptr = shmPointer {
+                let writeHead = ptr.load(as: UInt32.self)
+                context.readHead = Int(writeHead)
+            }
             destinations[deviceID] = context
             startDestinationOutput(context: context)
         } else {
@@ -174,7 +175,7 @@ final class AudioRouterEngine: @unchecked Sendable {
         logger.info("Stopped audio output routing to physical device \(context.deviceID)")
     }
 
-    /// Halts all active output routes and tears down capture procedures.
+    /// Halts all active output routes.
     func stopAllRoutes() {
         destinationLock.lock()
         let contexts = Array(destinations.values)
@@ -184,57 +185,42 @@ final class AudioRouterEngine: @unchecked Sendable {
         for context in contexts {
             stopDestinationOutput(context: context)
         }
-        stopCapture()
     }
 
-    /// Ingests captured raw PCM frames into the internal ring buffer.
-    /// - Parameters:
-    ///   - bufferList: Pointer to incoming audio buffer list.
-    ///   - frameCount: Number of audio frames.
-    private func handleInputAudio(bufferList: UnsafePointer<AudioBufferList>?, frameCount: UInt32) {
-        guard let bufferList else { return }
-        let buffers = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: bufferList))
-
-        for buffer in buffers {
-            guard let mData = buffer.mData else { continue }
-            let floatBuffer = mData.assumingMemoryBound(to: Float.self)
-            let sampleCount = Int(buffer.mDataByteSize) / MemoryLayout<Float>.size
-
-            ringBufferLock.lock()
-            for index in 0 ..< sampleCount {
-                ringBuffer[(writeHead + index) % ringBufferSize] = floatBuffer[index]
-            }
-            writeHead = (writeHead + sampleCount) % ringBufferSize
-            ringBufferLock.unlock()
-        }
-    }
-
-    /// Reads buffered PCM frames, applies attenuation, and populates destination buffers.
+    /// Reads buffered PCM frames from driver shared memory and populates destination buffers.
     /// - Parameters:
     ///   - context: The destination runtime context.
     ///   - bufferList: Target audio buffer list to populate.
-    private func handleOutputAudio(context: DestinationDeviceContext, bufferList: UnsafeMutablePointer<AudioBufferList>) {
+    private func handleOutputAudio(context: DestinationDeviceContext, bufferList: UnsafeMutablePointer<AudioBufferList>?) {
+        guard let bufferList, let ptr = shmPointer else { return }
         let buffers = UnsafeMutableAudioBufferListPointer(bufferList)
         let volume = context.isMuted ? 0.0 : context.volume
+        let bufferBase = ptr.advanced(by: MemoryLayout<OpenSoundSharedHeader>.size).assumingMemoryBound(to: Float.self)
+
+        let writeHead = Int(ptr.load(as: UInt32.self))
+        let available = (writeHead - context.readHead + kRingBufferSize) % kRingBufferSize
 
         for buffer in buffers {
             guard let mData = buffer.mData else { continue }
             let floatBuffer = mData.assumingMemoryBound(to: Float.self)
             let sampleCount = Int(buffer.mDataByteSize) / MemoryLayout<Float>.size
 
-            ringBufferLock.lock()
-            let available = (writeHead - readHead + ringBufferSize) % ringBufferSize
+            if available > kRingBufferSize - sampleCount {
+                context.readHead = (writeHead - sampleCount + kRingBufferSize) % kRingBufferSize
+            }
+
             let samplesToRead = min(sampleCount, available)
 
             for i in 0 ..< samplesToRead {
-                let sample = ringBuffer[(readHead + i) % ringBufferSize]
+                let sample = bufferBase[(context.readHead + i) % kRingBufferSize]
                 floatBuffer[i] = sample * volume
             }
 
             for i in samplesToRead ..< sampleCount {
                 floatBuffer[i] = 0.0
             }
-            ringBufferLock.unlock()
+
+            context.readHead = (context.readHead + samplesToRead) % kRingBufferSize
         }
     }
 }

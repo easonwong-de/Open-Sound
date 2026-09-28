@@ -1,7 +1,7 @@
 import CoreAudio
 import SwiftUI
 
-/// Main user interface providing audio endpoint routing toggles, volume sliders, and extension lifecycle controls.
+/// Main user interface providing audio endpoint routing toggles, volume sliders, and driver lifecycle controls.
 struct ContentView: View {
     @State private var viewModel = RouterViewModel()
 
@@ -26,7 +26,7 @@ struct ContentView: View {
 
     // MARK: - Header
 
-    /// Status header displaying application title and DriverKit extension state.
+    /// Status header displaying application title and Core Audio HAL driver state.
     private var headerView: some View {
         HStack(spacing: 12) {
             Image(systemName: "waveform.circle.fill")
@@ -41,10 +41,10 @@ struct ContentView: View {
 
                 HStack(spacing: 6) {
                     Circle()
-                        .fill(extensionStatusColor)
+                        .fill(driverStatusColor)
                         .frame(width: 8, height: 8)
 
-                    Text(viewModel.extensionManager.state.description)
+                    Text(viewModel.pluginManager.state.description)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -52,9 +52,15 @@ struct ContentView: View {
 
             Spacer()
 
-            if viewModel.extensionManager.state != .active {
-                Button("Install Extension") {
-                    viewModel.activateExtension()
+            if viewModel.pluginManager.state == .active {
+                Button("Uninstall Driver") {
+                    viewModel.uninstallDriver()
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            } else if viewModel.pluginManager.state != .installing && viewModel.pluginManager.state != .uninstalling {
+                Button("Install Driver") {
+                    viewModel.installDriver()
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
@@ -64,15 +70,13 @@ struct ContentView: View {
         .padding(.vertical, 12)
     }
 
-    /// Colour indicator corresponding to the current DriverKit extension state.
-    private var extensionStatusColor: Color {
-        switch viewModel.extensionManager.state {
+    /// Colour indicator corresponding to the current HAL driver state.
+    private var driverStatusColor: Color {
+        switch viewModel.pluginManager.state {
         case .active:
             return .green
-        case .requestingActivation, .requestingDeactivation:
+        case .installing, .uninstalling:
             return .orange
-        case .requiresApproval:
-            return .yellow
         case .error:
             return .red
         case .notInstalled:
@@ -142,7 +146,7 @@ struct ContentView: View {
 
     // MARK: - Footer
 
-    /// Footer bar providing endpoint count summary and global termination action.
+    /// Footer bar providing endpoint count summary and clean application termination action.
     private var footerView: some View {
         HStack {
             Text("\(viewModel.outputDevices.count) physical endpoints detected")
@@ -151,8 +155,8 @@ struct ContentView: View {
 
             Spacer()
 
-            Button("Quit & Deactivate", role: .destructive) {
-                viewModel.deactivateAndQuit()
+            Button("Quit") {
+                viewModel.quit()
             }
             .buttonStyle(.bordered)
             .controlSize(.small)

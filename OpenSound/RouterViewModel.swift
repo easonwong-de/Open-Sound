@@ -10,7 +10,7 @@ import SwiftUI
 final class RouterViewModel {
     private let hal = CoreAudioHAL.shared
     private let engine = AudioRouterEngine.shared
-    let extensionManager = ExtensionManager.shared
+    let pluginManager = PluginManager.shared
 
     private let logger = Logger(subsystem: "de.easonwong.OpenSound", category: "RouterViewModel")
 
@@ -49,6 +49,7 @@ final class RouterViewModel {
         }
 
         engine.setVirtualDevice(deviceID: virtualDevice?.id)
+        pluginManager.checkInstallationStatus()
     }
 
     /// Subscribes to system-level device addition, removal, and default route changes.
@@ -102,18 +103,19 @@ final class RouterViewModel {
         refreshDevices()
     }
 
-    /// Requests system extension installation and authorization.
-    func activateExtension() {
-        extensionManager.activateExtension()
+    /// Requests Core Audio HAL driver installation to `/Library/Audio/Plug-Ins/HAL/`.
+    func installDriver() {
+        pluginManager.installPlugin()
     }
 
-    /// Tears down all active audio pipelines, requests extension uninstallation, and terminates the application.
-    func deactivateAndQuit() {
-        engine.stopAllRoutes()
-        extensionManager.deactivateExtension()
+    /// Uninstalls the Core Audio HAL driver.
+    func uninstallDriver() {
+        pluginManager.uninstallPlugin()
+    }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-            NSApplication.shared.terminate(nil)
-        }
+    /// Tears down active audio pipelines and cleanly terminates the application.
+    func quit() {
+        engine.stopAllRoutes()
+        NSApplication.shared.terminate(nil)
     }
 }
